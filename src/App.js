@@ -40,7 +40,7 @@ function App() {
   }, [searchTerm, category, products]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+   <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <Navbar 
         searchTerm={searchTerm} 
         setSearchTerm={setSearchTerm} 
