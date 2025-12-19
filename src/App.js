@@ -17,19 +17,9 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
-    const getProducts = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchProducts();
-        setProducts(data);
-        setFiltered(data);
-      } catch (err) {
-        setError("Failed to fetch products. Check your connection.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    getProducts();
+    fetchProducts()
+      .then(data => { setProducts(data); setFiltered(data); setLoading(false); })
+      .catch(() => { setError("Failed to fetch products."); setLoading(false); });
   }, []);
 
   useEffect(() => {
@@ -40,26 +30,15 @@ function App() {
   }, [searchTerm, category, products]);
 
   return (
-   <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-      <Navbar 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-        setSelectedCategory={setCategory} 
-        onCartClick={() => setIsCartOpen(true)}
-      />
-      
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} setSelectedCategory={setCategory} onCartClick={() => setIsCartOpen(true)} />
       <main className="max-w-7xl mx-auto p-6">
-        {loading ? <Loader /> : error ? (
-          <div className="text-center py-20 text-red-500">{error}</div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-gray-500 font-medium">No products found.</div>
-        ) : (
+        {loading ? <Loader /> : error ? <div className="text-center py-20 text-red-500">{error}</div> : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filtered.map(p => <ProductCard key={p.id} product={p} onOpen={() => setSelected(p)} />)}
           </div>
         )}
       </main>
-
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       {selected && <ProductModal product={selected} onClose={() => setSelected(null)} />}
     </div>
