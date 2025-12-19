@@ -1,14 +1,22 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
+  // LocalStorage se data load karna
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('swiftCart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  // Jab bhi cart badle, LocalStorage update karein
+  useEffect(() => {
+    localStorage.setItem('swiftCart', JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (product) => {
     setCart((prev) => {
-      const isExist = prev.find(item => item.id === product.id);
-      if (isExist) return prev;
+      if (prev.find(item => item.id === product.id)) return prev;
       return [...prev, product];
     });
   };

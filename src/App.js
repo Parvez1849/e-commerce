@@ -13,6 +13,7 @@ function App() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
+  const [sortOrder, setSortOrder] = useState('default');
   const [selected, setSelected] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -23,18 +24,33 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let result = products;
+    let result = [...products];
+
+    // Category Filter
     if (category !== 'all') result = result.filter(p => p.category === category);
+    
+    // Search Filter
     if (searchTerm) result = result.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    // Price Sorting Logic
+    if (sortOrder === 'low') result.sort((a, b) => a.price - b.price);
+    if (sortOrder === 'high') result.sort((a, b) => b.price - a.price);
+
     setFiltered(result);
-  }, [searchTerm, category, products]);
+  }, [searchTerm, category, sortOrder, products]);
 
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} setSelectedCategory={setCategory} onCartClick={() => setIsCartOpen(true)} />
-      <main className="max-w-7xl mx-auto p-6">
-        {loading ? <Loader /> : error ? <div className="text-center py-20 text-red-500">{error}</div> : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <Navbar 
+        searchTerm={searchTerm} 
+        setSearchTerm={setSearchTerm} 
+        setSelectedCategory={setCategory} 
+        setSortOrder={setSortOrder}
+        onCartClick={() => setIsCartOpen(true)} 
+      />
+      <main className="max-w-7xl mx-auto p-4 md:p-6">
+        {loading ? <Loader /> : error ? <div className="text-center py-20 text-red-500 font-bold">{error}</div> : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {filtered.map(p => <ProductCard key={p.id} product={p} onOpen={() => setSelected(p)} />)}
           </div>
         )}
